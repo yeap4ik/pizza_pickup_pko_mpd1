@@ -27,14 +27,15 @@ LOCAL_TIMES = [
     [22, 21, 27, 30, 27, 19, 10, 13, 22, 24, 39, 34, 0],
 ]
 LOCAL_READY = [0, 0, 12, 0, 25, 8, 35, 0, 20, 30, 22, 18, 28]
+LOCAL_SIZES = [4, 6, 8, 9, 10, 11, 12]
 
 if USE_LARGE_DATA:
-    from pizza_data import TIMES, READY
+    from pizza_data import TIMES, READY, SIZES
 else:
     TIMES = LOCAL_TIMES
     READY = LOCAL_READY
+    SIZES = LOCAL_SIZES
 
-SIZES = [4, 6, 8, 9, 10, 11, 12, 30, 50]
 RUNS = 10
 ITERATIONS = 10000
 START_TEMPERATURE = 20.0

@@ -1,6 +1,6 @@
-Lai palaistu SA algoritmu kopā ar pilno pārlasi, ir nepieciešāms izsaukt run_brute_force_and_sa(), lai palaistu tikai SA: run_sa_only().
+Lai palaistu SA algoritmu kopā ar pilno pārlasi, ir nepieciešams izsaukt run_brute_force_and_sa(), savukārt, lai palaistu tikai SA: run_sa_only().
 
-Ja tiek palaista SA kopā ar pilno pārlasi ir nepieciešāms parametru USE_LARGE_DATA iestatīt uz False un no masīva SIZES noņemt 30 un 50, lai maksimums būtu 12 picerijas.
+Ar parametru USE_LARGE_DATA var iestatīt testa apjomu: ja tas ir False, tiek izmantota maza testu kopa (līdz 12 picērijām), savukārt, ja True, tad liela (līdz 50).
 
 "Traveling salesman problem" picas adaptācijā.
 
