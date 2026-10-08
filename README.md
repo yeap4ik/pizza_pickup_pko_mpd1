@@ -7,7 +7,6 @@ Ieejas dati: matrica ar braukšanas laikiem no mājas uz katru piceriju un starp
 Gājiens: nejauši izvēlētu picēriju pārvieto uz nejaušu pozīciju tās pašas vai otras mašīnas maršrutā.
 
 Tiek izmantots SA algoritms.
-Lai būtu iespēja parbaudīt optimizācijas rezultātu, uz mazām piceriju skaitām tiek izmantota pilna pārlase, lai atrastu garantēto labāko kombināciju un pēc tām salidzīnāt rezultātus ar SA iegūto kombināciju.
 
 SA algoritms izmanto 10000 iterācijās, 10 mēģinājumus, sākuma temperatūra 20.0, beigu temperatūra 0.1.
 
