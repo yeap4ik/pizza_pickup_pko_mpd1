@@ -12,6 +12,7 @@ Lai būtu iespēja parbaudīt optimizācijas rezultātu, uz mazām piceriju skai
 SA algoritms izmanto 10000 iterācijās, 10 mēģinājumus, sākuma temperatūra 20.0, beigu temperatūra 0.1.
 
 Piemērs, kā izskatās matrica:
+
 [0, 7, 10, 9]
 [7, 0, 7, 13]
 [10, 7, 0, 10]
