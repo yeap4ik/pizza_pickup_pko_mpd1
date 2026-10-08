@@ -1,3 +1,6 @@
+Lai palaistu SA algoritmu kopā ar pilno pārlasi, ir nepieciešāms izsaukt run_brute_force_and_sa(), lai palaistu tikai SA: run_sa_only().
+Ja tiek palaista SA kopā ar pilno pārlasi ir nepieciešāms parametru USE_LARGE_DATA iestatīt uz False un no massīva SIZES noņemt 30 un 50, lai maksimums būtu 12 picerijas.
+
 "Traveling salesman problem" picas adaptācijā.
 
 Tiek dotas picerijas, kuras ir nepieciešāms apbraukāt ar divām mašīnām, lai izņemt visas pasūtītas picas no picerijam un piegadāt tos mājas. Ir zināms braukšanās laiks no vienas piecerijas uz katru citu, ka arī līdz mājām. Vērā tiek ņēmts arī picas gatavošanas laiks.
