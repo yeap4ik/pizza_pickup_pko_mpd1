@@ -1,12 +1,3 @@
-# "Traveling salesman problem" picas adaptācijā.
-# Tiek dotas picerijas, kuras ir nepieciešāms apstaigāts ar divām mašīnām, lai izņemt no tām picas un piegadāt tos mājas. Vērā tiek ņēmts arī picas gatavošanas laiks.
-
-# Ieejas dati: matrica ar braukšanas laikiem no mājas uz katru piceriju un starp picerijām, kā arī saraksts ar katras picerijas gatavošanas laiku.
-# Gājiens: nejauši izvēlētu picēriju pārvieto uz nejaušu pozīciju tās pašas vai otras mašīnas maršrutā.
-# Tiek izmantots SA algoritms.
-# Lai būtu iespēja parbaudīt optimizācijas rezultātu, uz mazām piceriju skaitām tiek izmantota pilna pārlase, lai atrastu garantēto labāko kombināciju.
-
-
 import math
 import multiprocessing
 import os
@@ -16,9 +7,11 @@ from itertools import permutations
 from time import perf_counter
 
 
-# Data for up to 12 pizzerias. SIZES selects which examples to run.
-# Rows -> from, columns -> to
-TIMES = [
+# False: up to 12 pizzerias. True: up to 50 pizzerias.
+USE_LARGE_DATA = True
+
+# Original data for up to 12 pizzerias.
+LOCAL_TIMES = [
     [0, 7, 10, 9, 10, 10, 14, 13, 14, 18, 18, 15, 22],
     [7, 0, 7, 13, 17, 15, 15, 9, 7, 24, 20, 22, 21],
     [10, 7, 0, 10, 17, 19, 22, 15, 10, 27, 14, 21, 27],
@@ -33,9 +26,15 @@ TIMES = [
     [15, 22, 21, 11, 7, 15, 25, 28, 28, 17, 17, 0, 34],
     [22, 21, 27, 30, 27, 19, 10, 13, 22, 24, 39, 34, 0],
 ]
-READY = [0, 0, 12, 0, 25, 8, 35, 0, 20, 30, 22, 18, 28]
+LOCAL_READY = [0, 0, 12, 0, 25, 8, 35, 0, 20, 30, 22, 18, 28]
 
-SIZES = [4, 6, 8, 9, 10, 11]
+if USE_LARGE_DATA:
+    from pizza_data import TIMES, READY
+else:
+    TIMES = LOCAL_TIMES
+    READY = LOCAL_READY
+
+SIZES = [4, 6, 8, 9, 10, 11, 30, 50]
 RUNS = 10
 ITERATIONS = 10000
 START_TEMPERATURE = 20.0
@@ -112,7 +111,7 @@ def neighbor(routes, rng):
         return result
     car, i = rng.choice(positions)
     pizzeria = result[car].pop(i)
-    target = rng.randrange(2)  # Та же машина или другая.
+    target = rng.randrange(2)
     position = rng.randrange(len(result[target]) + 1)
     result[target].insert(position, pizzeria)
     return result
@@ -159,14 +158,70 @@ def show_routes(routes, times, ready):
         print(f"  Car {car}: {path}; return time: {route_time(route, times, ready)} min")
 
 
-def main():
+def get_example(n):
+    maximum = min(len(TIMES), len(READY)) - 1
+    if not 1 <= n <= maximum:
+        raise ValueError(f"Requested {n} pizzerias, but data is available for 1 to {maximum}. Update SIZES or extend TIMES and READY.")
+    times = [row[:n + 1] for row in TIMES[:n + 1]]
+    if any(len(row) != n + 1 for row in times):
+        raise ValueError(f"The travel-time matrix is incomplete for {n} pizzerias.")
+    return times, READY[:n + 1]
+
+
+def run_sa_runs(times, ready, optimum=None):
+    n = len(times) - 1
+    values, durations = [], []
+    best_routes, best_value = None, math.inf
+    print("SA: seed | result (min) | gap (%) | computation time (s)")
+    for seed in range(RUNS):
+        started = perf_counter()
+        routes, value = simulated_annealing(times, ready, seed)
+        elapsed = perf_counter() - started
+        check_routes(routes, n)
+        assert value == cost(routes, times, ready)
+        values.append(value)
+        durations.append(elapsed)
+        if value < best_value:
+            best_routes, best_value = routes, value
+
+        gap_text = "N/A"
+        if optimum is not None:
+            assert value >= optimum
+            gap = 100 * (value - optimum) / optimum if optimum else 0
+            gap_text = f"{gap:.2f}"
+        print(f"    {seed:2} | {value:15} | {gap_text:>14} | {elapsed:.6f}")
+
+    mean = sum(values) / RUNS
+    print(f"SA: best {min(values)} min; mean {mean:.2f} min; worst {max(values)} min.")
+    if optimum is not None:
+        print(f"Optimum found in {values.count(optimum)}/{RUNS} runs.")
+    print(f"Mean SA computation time: {sum(durations) / RUNS:.6f} s.")
+    print("Best SA routes:")
+    show_routes(best_routes, times, ready)
+
+
+def run_sa_only():
+    for n in SIZES:
+        get_example(n)
+    print("SA only: two cars, order readiness times included.")
+    print(f"SA: {RUNS} runs, seeds 0..{RUNS - 1}, {ITERATIONS} iterations.")
+    print(f"Temperature: {START_TEMPERATURE} -> {END_TEMPERATURE} min.")
+    print("The exact optimum is not computed; gap is shown as N/A.")
+    for n in SIZES:
+        times, ready = get_example(n)
+        print(f"\n--- {n} pizzerias: starting SA only ---", flush=True)
+        run_sa_runs(times, ready)
+
+
+def run_brute_force_and_sa():
+    for n in SIZES:
+        get_example(n)
     print("Brute force and SA:")
     print(f"SA: {RUNS} runs, seeds 0..{RUNS - 1}, {ITERATIONS} iterations.")
     print(f"Temperature: {START_TEMPERATURE} -> {END_TEMPERATURE} min.")
     print(f"Brute force for 8 or more pizzerias: {PARALLEL_WORKERS} processes (1 = sequential).")
     for n in SIZES:
-        times = [row[:n + 1] for row in TIMES[:n + 1]]
-        ready = READY[:n + 1]
+        times, ready = get_example(n)
 
         print(f"\n--- {n} pizzerias: starting brute force ---", flush=True)
         started = perf_counter()
@@ -180,29 +235,9 @@ def main():
               f"optimum {optimum} min; computation time {exact_seconds:.6f} s.")
         show_routes(exact_routes, times, ready)
 
-        values, durations = [], []
-        best_routes, best_value = None, math.inf
-        print("SA: seed | result (min) | gap (%) | computation time (s)")
-        for seed in range(RUNS):
-            started = perf_counter()
-            routes, value = simulated_annealing(times, ready, seed)
-            elapsed = perf_counter() - started
-            check_routes(routes, n)
-            assert value == cost(routes, times, ready) and value >= optimum
-            values.append(value)
-            durations.append(elapsed)
-            if value < best_value:
-                best_routes, best_value = routes, value
-            gap = 100 * (value - optimum) / optimum if optimum else 0
-            print(f"    {seed:2} | {value:15} | {gap:14.2f} | {elapsed:.6f}")
-
-        mean = sum(values) / RUNS
-        print(f"SA: best {min(values)} min; mean {mean:.2f} min; "
-              f"worst {max(values)} min; optimum found in {values.count(optimum)}/{RUNS} runs.")
-        print(f"Mean SA computation time: {sum(durations) / RUNS:.6f} s.")
-        print("Best SA routes:")
-        show_routes(best_routes, times, ready)
+        run_sa_runs(times, ready, optimum)
 
 
 if __name__ == "__main__":
-    main()
+    run_sa_only() #SA only
+    # run_brute_force_and_sa() #SA and brute force
