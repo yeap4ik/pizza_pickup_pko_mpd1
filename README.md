@@ -22,8 +22,14 @@ Piemērs, kā izskatās matrica:
 [9, 13, 10, 0]
 
 Matrica apzīmē nepieciešamo laiku, lai tiktu no vienas vietas uz citu. Matrica ir simetriska, jo braukšanas laiks turp un atpakaļ nemainās.
+
 Piemēram, lai tiktu no mājām uz pirmo picēriju, ir nepieciešamas 7 minūtes. [0][1]
+
 Lai tiktu no mājām uz otro picēriju, ir nepieciešamas 10 minūtes. [0][2]
+
 Lai tiktu no pirmās picērijas uz otro, ir nepieciešamas 7 minūtes. [1][2]
+
 Lai tiktu no pirmās picērijas uz trešo, ir nepieciešamas 13 minūtes. [1][3]
+
 Lai tiktu no pirmās picērijas uz pirmo picēriju, ir nepieciešamas 0 minūtes. [1][1]
+
