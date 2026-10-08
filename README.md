@@ -14,9 +14,13 @@ SA algoritms izmanto 10000 iterācijās, 10 mēģinājumus, sākuma temperatūra
 Piemērs, kā izskatās matrica:
 
 [0, 7, 10, 9]
+
 [7, 0, 7, 13]
+
 [10, 7, 0, 10]
+
 [9, 13, 10, 0]
+
 Matrica apzīmē nepieciešamo laiku, lai tiktu no vienas vietas uz citu. Matrica ir simetriska, jo braukšanas laiks turp un atpakaļ nemainās.
 Piemēram, lai tiktu no mājām uz pirmo picēriju, ir nepieciešamas 7 minūtes. [0][1]
 Lai tiktu no mājām uz otro picēriju, ir nepieciešamas 10 minūtes. [0][2]
